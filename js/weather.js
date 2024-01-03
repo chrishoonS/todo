@@ -1,23 +1,35 @@
-const API_KEY = "714c1c37d62e741fa4af4af38e5241e0";
+const API_KEY = "c35045143ed613ee20048c6710e31f03";
+navigator.geolocation.getCurrentPosition(onGeoOk, onGeoErr);
 
 function onGeoOk(position) {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
-    fetch(url).then(response => response.json())
-              .then(data => {
-                const weather = document.querySelector("#weather span:first-child");
-                const city = document.querySelector("#weather span:last-child");
-                city.innerText = data.name;
-                weather.innerText = `${data.weather[0].main} / ${data.main.temp}`;
-                console.log(data.name, data.weather[0].main);
-            });
-
-    console.log("You live in", lat, lon, url);
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+  fetch(url)
+    .then((response) => response.json()) //response의 json을 얻고 그 결과로 다음 작업 진행
+    .then((data) => {
+      const weatherIcon = document.createElement("img");
+      weatherIcon.src=`http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+      weatherIcon.alt="icon";
+      const weatherRow = document.querySelector("#weather li:first-child");
+      weatherRow.appendChild(weatherIcon);
+      const temp = document.querySelector("#weather li:first-child span");
+      const city = document.querySelector("#weather li:last-child span");
+      temp.innerText = `${Math.ceil(data.main.temp)}°C`;
+      city.innerText = data.name;
+    });
+}
+function onGeoErr() {
+  alert("Cant' find you. No weather infomation for you.")
 }
 
-function onGeoError() {
-    alert("유저의 위치를 찾을 수 없습니다.");
-}
 
-navigator.geolocation.getCurrentPosition(onGeoOk, onGeoError);
+
+const weatherContainer = document.querySelector("#weather");
+weatherContainer.addEventListener("click",goToKMA);
+
+function goToKMA() {
+  window.open(
+    "https://www.weather.go.kr/","_blank"
+  );
+}
